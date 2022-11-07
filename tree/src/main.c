@@ -1,5 +1,6 @@
 #include "stdio.h"
 #include "stdlib.h"
+#define bool int
 
 
 struct node {
@@ -8,66 +9,47 @@ struct node {
     struct node* right;
 };
 
+struct node *newNode(int item) {
+    struct node *node = (struct node *)malloc(sizeof(struct node));
+    node -> item = item;
+    node -> left = NULL;
+    node -> right = NULL;
 
-void preorderTraversal(struct node* root) {
-    if (root == NULL) return;
-    printf("%d -> ", root -> item);
-    preorderTraversal(root -> left);
-    preorderTraversal(root -> right);
+    return (node);
 }
 
-void inorderTraversal(struct node* root) {
-    if (root == NULL) return;
-    inorderTraversal(root -> left);
-    printf("%d -> ", root -> item);
-    inorderTraversal(root -> right);
+bool checkHeightBalance(struct node *root, int *height) {
+    int leftHeight = 0, rightHeight = 0;
+    int l = 0, r = 0;
+
+    if (root == NULL) {
+        *height = 0;
+        return 1;
+    }
+
+    l = checkHeightBalance(root -> left, &leftHeight);
+    r = checkHeightBalance(root -> right, &rightHeight);
+
+    *height = (leftHeight > rightHeight ? leftHeight : rightHeight) + 1;
+
+    if ((leftHeight - rightHeight >= 2)|| (rightHeight - leftHeight >= 2))
+        return 0;
+    else
+        return l && r;
 }
 
 
-void postorderTraversal(struct node* root) {
-    if (root == NULL) return;
-    postorderTraversal(root -> left);
-    postorderTraversal(root -> right);
-    printf("%d -> ", root -> item);
-}
+int main() {
+    int height = 0;
 
+    struct node *root = newNode(1);
+    root -> left = newNode(2);
+    root -> right = newNode(3);
+    root -> left -> left = newNode(4);
+    root -> left -> right = newNode(5);
 
-struct node* createNode(value) {
-    struct node* newNode = malloc(sizeof(struct node));
-    newNode -> item = value;
-    newNode -> left = NULL;
-    newNode -> right = NULL;
-
-    return newNode;
-}
-
-struct node* insertLeft(struct node* root, int value) {
-    root -> left = createNode(value);
-    return root -> left;
-}
-
-struct node* insertRight(struct node* root, int value) {
-    root -> right = createNode(value);
-    return root -> right;
-}
-
-int main () {
-    struct node* root = createNode(1);
-
-    insertLeft(root, 12);
-    insertRight(root, 9);
-
-    insertLeft(root -> left, 5);
-    insertRight(root -> left, 6);
-
-    printf("Inorder traversal \n");
-    inorderTraversal(root);
-
-
-    printf("\nPostorder traversal \n");
-    postorderTraversal(root);
-
-
-    printf("\nPreorder traversal \n");
-    preorderTraversal(root);
+    if (checkHeightBalance(root, &height))
+        printf("the is balanced");
+    else
+        printf("tree is not balanced");
 }
